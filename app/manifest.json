@@ -6,20 +6,19 @@
   "version": "1.0.0",
   "default_locale": "en",
   "permissions": [
-    "identity",
     "fileSystemProvider",
     "storage",
     "notifications",
-    "https://api.dropbox.com/",
-    "https://api-content.dropbox.com/"
+    "https://api.github.com/",
+    "https://raw.githubusercontent.com/"
   ],
   "app": {
     "background": {
       "scripts": [
           "bower_components/jquery/dist/jquery.min.js",
           "scripts/metadata_cache.js",
-          "scripts/dropbox_client.js",
-          "scripts/dropbox_fs.js",
+          "scripts/github_client.js",
+          "scripts/github_fs.js",
           "scripts/background.js"]
     }
   },
