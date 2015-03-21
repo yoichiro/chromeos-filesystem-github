@@ -156,6 +156,7 @@
             length: options.length,
             onSuccess: function(result) {
                 console.log(result);
+                console.log(result.byteLength);
                 successCallback(result, false);
             }.bind(this),
             onError: function(reason) {
@@ -177,177 +178,6 @@
             }.bind(this)
         });
     };
-
-/*
-    GithubFS.prototype.onCreateDirectoryRequested = function(options, successCallback, errorCallback) {
-        console.log("onCreateDirectoryRequested");
-        console.log(options);
-        var sftpClient = getSftpClient.call(this, options.fileSystemId);
-        var requestId = createRequestId.call(this);
-        prepare.call(this, sftpClient, requestId, function(closeCallback) {
-            sftpClient.createDirectory({
-                requestId: requestId,
-                path: options.directoryPath,
-                onSuccess: function() {
-                    successCallback();
-                    closeCallback();
-                }.bind(this),
-                onError: function(reason) {
-                    console.log(reason);
-                    errorCallback("FAILED");
-                    closeCallback();
-                }
-            });
-        }.bind(this), function(reason) {
-            console.log(reason);
-            errorCallback("FAILED");
-        }.bind(this));
-    };
-
-    GithubFS.prototype.onDeleteEntryRequested = function(options, successCallback, errorCallback) {
-        console.log("onDeleteEntryRequested");
-        console.log(options);
-        var sftpClient = getSftpClient.call(this, options.fileSystemId);
-        var requestId = createRequestId.call(this);
-        prepare.call(this, sftpClient, requestId, function(closeCallback) {
-            sftpClient.deleteEntry({
-                requestId: requestId,
-                path: options.entryPath,
-                onSuccess: function() {
-                    var metadataCache = getMetadataCache.call(this, options.fileSystemId);
-                    metadataCache.remove(options.entryPath);
-                    successCallback();
-                    closeCallback();
-                }.bind(this),
-                onError: function(reason) {
-                    console.log(reason);
-                    errorCallback("FAILED");
-                    closeCallback();
-                }
-            });
-        }.bind(this), function(reason) {
-            console.log(reason);
-            errorCallback("FAILED");
-        }.bind(this));
-    };
-
-    GithubFS.prototype.onMoveEntryRequested = function(options, successCallback, errorCallback) {
-        console.log("onMoveEntryRequested");
-        console.log(options);
-        var sftpClient = getSftpClient.call(this, options.fileSystemId);
-        var requestId = createRequestId.call(this);
-        prepare.call(this, sftpClient, requestId, function(closeCallback) {
-            sftpClient.moveEntry({
-                requestId: requestId,
-                sourcePath: options.sourcePath,
-                targetPath: options.targetPath,
-                onSuccess: function() {
-                    var metadataCache = getMetadataCache.call(this, options.fileSystemId);
-                    metadataCache.remove(options.sourcePath);
-                    metadataCache.remove(options.targetPath);
-                    successCallback();
-                    closeCallback();
-                }.bind(this),
-                onError: function(reason) {
-                    console.log(reason);
-                    errorCallback("FAILED");
-                    closeCallback();
-                }
-            });
-        }.bind(this), function(reason) {
-            console.log(reason);
-            errorCallback("FAILED");
-        }.bind(this));
-    };
-
-    GithubFS.prototype.onCopyEntryRequested = function(options, successCallback, errorCallback) {
-        console.log("onCopyEntryRequested");
-        console.log(options);
-        // TODO Implement copy operation.
-        errorCallback("INVALID_OPERATION");
-    };
-
-    GithubFS.prototype.onWriteFileRequested = function(options, successCallback, errorCallback) {
-        console.log("onWriteFileRequested");
-        console.log(options);
-        var filePath = getOpenedFiles.call(this, options.fileSystemId)[options.openRequestId];
-        var sftpClient = getSftpClient.call(this, options.fileSystemId);
-        var requestId = createRequestId.call(this);
-        prepare.call(this, sftpClient, requestId, function(closeCallback) {
-            sftpClient.writeFile({
-                requestId: requestId,
-                path: filePath,
-                offset: options.offset,
-                data: options.data,
-                onSuccess: function() {
-                    successCallback();
-                    closeCallback();
-                }.bind(this),
-                onError: function(reason) {
-                    console.log(reason);
-                    errorCallback("FAILED");
-                    closeCallback();
-                }
-            });
-        }.bind(this), function(reason) {
-            console.log(reason);
-            errorCallback("FAILED");
-        }.bind(this));
-    };
-
-    GithubFS.prototype.onTruncateRequested = function(options, successCallback, errorCallback) {
-        console.log("onTruncateRequested");
-        console.log(options);
-        var sftpClient = getSftpClient.call(this, options.fileSystemId);
-        var requestId = createRequestId.call(this);
-        prepare.call(this, sftpClient, requestId, function(closeCallback) {
-            sftpClient.truncate({
-                requestId: requestId,
-                path: options.filePath,
-                length: options.length,
-                onSuccess: function() {
-                    successCallback(false);
-                    closeCallback();
-                }.bind(this),
-                onError: function(reason) {
-                    console.log(reason);
-                    errorCallback("FAILED");
-                    closeCallback();
-                }
-            });
-        }.bind(this), function(reason) {
-            console.log(reason);
-            errorCallback("FAILED");
-        }.bind(this));
-    };
-
-    GithubFS.prototype.onCreateFileRequested = function(options, successCallback, errorCallback) {
-        console.log("onCreateFileRequested");
-        console.log(options);
-        var sftpClient = getSftpClient.call(this, options.fileSystemId);
-        var requestId = createRequestId.call(this);
-        prepare.call(this, sftpClient, requestId, function(closeCallback) {
-            sftpClient.createFile({
-                requestId: requestId,
-                path: options.filePath,
-                onSuccess: function() {
-                    var metadataCache = getMetadataCache.call(this, options.fileSystemId);
-                    metadataCache.remove(options.filePath);
-                    successCallback();
-                    closeCallback();
-                }.bind(this),
-                onError: function(reason) {
-                    console.log(reason);
-                    errorCallback("FAILED");
-                    closeCallback();
-                }
-            });
-        }.bind(this), function(reason) {
-            console.log(reason);
-            errorCallback("FAILED");
-        }.bind(this));
-    };
-*/
 
     GithubFS.prototype.checkAlreadyMounted = function(username, repositoryName, branch, callback) {
         var fileSystemId = createFileSystemID.call(this, username, repositoryName, branch);
@@ -536,36 +366,6 @@
             createEventHandler.call(this, function(options, successCallback, errorCallback) {
                 this.onCloseFileRequested(options, successCallback, errorCallback);
             }.bind(this)));
-        /*
-        chrome.fileSystemProvider.onCreateDirectoryRequested.addListener(
-            createEventHandler.call(this, function(options, successCallback, errorCallback) {
-                this.onCreateDirectoryRequested(options, successCallback, errorCallback);
-            }.bind(this)));
-        chrome.fileSystemProvider.onDeleteEntryRequested.addListener(
-            createEventHandler.call(this, function(options, successCallback, errorCallback) {
-                this.onDeleteEntryRequested(options, successCallback, errorCallback);
-            }.bind(this)));
-        chrome.fileSystemProvider.onMoveEntryRequested.addListener(
-            createEventHandler.call(this, function(options, successCallback, errorCallback) {
-                this.onMoveEntryRequested(options, successCallback, errorCallback);
-            }.bind(this)));
-        chrome.fileSystemProvider.onCopyEntryRequested.addListener(
-            createEventHandler.call(this, function(options, successCallback, errorCallback) {
-                this.onCopyEntryRequested(options, successCallback, errorCallback);
-            }.bind(this)));
-        chrome.fileSystemProvider.onWriteFileRequested.addListener(
-            createEventHandler.call(this, function(options, successCallback, errorCallback) {
-                this.onWriteFileRequested(options, successCallback, errorCallback);
-            }.bind(this)));
-        chrome.fileSystemProvider.onTruncateRequested.addListener(
-            createEventHandler.call(this, function(options, successCallback, errorCallback) {
-                this.onTruncateRequested(options, successCallback, errorCallback);
-            }.bind(this)));
-        chrome.fileSystemProvider.onCreateFileRequested.addListener(
-            createEventHandler.call(this, function(options, successCallback, errorCallback) {
-                this.onCreateFileRequested(options, successCallback, errorCallback);
-            }.bind(this)));
-        */
     };
 
     var getGithubClient = function(fileSystemID) {
@@ -580,12 +380,6 @@
             this.opened_files_[fileSystemId] = openedFiles;
         }
         return openedFiles;
-    };
-
-    var createRequestId = function() {
-        // var requestId = options.requestId;
-        var requestId = 0;
-        return requestId;
     };
 
     var getMetadataCache = function(fileSystemId) {

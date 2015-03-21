@@ -33,53 +33,6 @@
         return this.branch_;
     }
 
-    GithubClient.prototype.test = function() {
-        console.log("test");
-        console.log(createBasicCredential.call(this));
-        this.getRepositories(function(repos) {
-            console.log(repos);
-        }.bind(this), function(error) {
-            console.log(error);
-        }.bind(this));
-        this.getBranches("test-repository", function(branches) {
-            console.log(branches);
-        }.bind(this), function(error) {
-            console.log(error);
-        }.bind(this));
-        this.readDirectory("test-repository", "master", "/", function(result) {
-            console.log(result);
-        }.bind(this), function(error) {
-            console.log(error);
-        }.bind(this));
-        this.getMetadata("test-repository", "master", "/hoge.txt", function(result) {
-            console.log(result);
-        }.bind(this), function(error) {
-            console.log(error);
-        }.bind(this));
-        this.readFile("test-repository", "master", "/hoge.txt", function(result) {
-            console.log(result.byteLength);
-        }.bind(this), function(error) {
-            console.log(error);
-        }.bind(this));
-        this.createDirectory("test-repository", "master", "/dirtest", function(result) {
-            console.log(result);
-        }.bind(this), function(error) {
-            console.log(error);
-        }.bind(this));
-        /*
-        this.deleteFile("test-repository", "master", "/dirtest/.gitkeep", function(result) {
-            console.log(result);
-        }.bind(this), function(error) {
-            console.log(error);
-        }.bind(this));
-         */
-        this.moveFile("test-repository", "master", "/source/aaa", "/target/aaa", function() {
-            console.log();
-        }.bind(this), function(error) {
-            console.log(error);
-        }.bind(this));
-    };
-
     GithubClient.prototype.getRepositories = function(onSuccess, onError) {
         sendGetRequest.call(this, {
             path: "/user/repos",
@@ -144,39 +97,6 @@
         });
     };
 
-    // Must specify "FILE PATH" not "DIR PATH".
-    // options: entryPath, onSuccess, onError
-    /*
-    GithubClient.prototype.getMetadata = function(options) {
-        if (options.entryPath === "/") {
-            var metadata = {
-                isDirectory: true,
-                name: "",
-                size: 0,
-                modificationTime: new Date()
-            };
-            options.onSuccess(metadata);
-        } else {
-            sendGetRequest.call(this, {
-                path: createRepositoryPath.call(this) + "/contents" + options.entryPath + "?ref=" + this.branch_,
-                onSuccess: function(item) {
-                    var metadata = {
-                        isDirectory: false,
-                        name: item.name,
-                        size: item.size,
-                        modificationTime: new Date()
-                    };
-                    options.onSuccess(metadata);
-                }.bind(this),
-                onError: function(error) {
-                    console.log(error);
-                    options.onError(error);
-                }.bind(this)
-            });
-        }
-    };
-    */
-
     GithubClient.prototype.openFile = function(filePath, requestId, mode, onSuccess, onError) {
         this.writeRequestMap[requestId] = {
             mode: mode
@@ -191,6 +111,7 @@
             dataType: "binary",
             responseType: "arraybuffer",
             range: [options.offset, options.length],
+            contentType: "application/octet-stream",
             onSuccess: function(data) {
                 options.onSuccess(data);
             }.bind(this),
@@ -205,83 +126,6 @@
         delete this.writeRequestMap[options.requestId];
         options.onSuccess();
     };
-
-/*
-    GithubClient.prototype.createDirectory = function(repositoryName, branch, dirPath, onSuccess, onError) {
-        sendPutRequest.call(this, {
-            path: "/repos/" + this.username_ + "/" + repositoryName + "/contents" + dirPath + "/.gitkeep",
-            data: {
-                message: "Created " + dirPath + " directory.",
-                content: "",
-                branch: branch
-            },
-            onSuccess: function(result) {
-                console.log(result);
-            }.bind(this),
-            onError: function(error) {
-                console.log(error);
-            }.bind(this)
-        });
-    };
-
-    GithubClient.prototype.deleteFile = function(repositoryName, branch, filePath, onSuccess, onError) {
-        getSha.call(this, repositoryName, branch, filePath, function(sha) {
-            sendDeleteRequest.call(this, {
-                path: "/repos/" + this.username_ + "/" + repositoryName + "/contents" + filePath,
-                data: {
-                    message: "Deleted " + filePath + " file.",
-                    branch: branch,
-                    sha: sha
-                },
-                onSuccess: function(result) {
-                    console.log(result);
-                }.bind(this),
-                onError: function(error) {
-                    console.log(error);
-                }.bind(this)
-            });
-        }.bind(this), function(error) {
-            console.log(error);
-        }.bind(this));
-    };
-
-    GithubClient.prototype.moveFile = function(repositoryName, branch, sourcePath, targetPath, onSuccess, onError) {
-        getLatestCommitSha.call(this, repositoryName, branch, function(latestCommitSha) {
-            getTree.call(this, repositoryName, latestCommitSha, true, function(tree) {
-                forEach(tree, function(ref) {
-                    console.log(ref);
-                    if (ref.path === sourcePath.substring(1)) {
-                        ref.path = targetPath.substring(1);
-                    }
-                }.bind(this));
-                postTree.call(this, repositoryName, tree, function(rootTree) {
-                    commit.call(
-                        this, repositoryName, latestCommitSha, rootTree,
-                        "Moved " + sourcePath + " to " + targetPath + ".",
-                        function(commit) {
-                            updateHead.call(this, repositoryName, branch, commit, function() {
-                                this.deleteFile(repositoryName, branch, sourcePath, function() {
-                                    onSuccess();
-                                }.bind(this), function(error) {
-                                    console.log(error);
-                                }.bind(this));
-                            }.bind(this), function(error) {
-                                console.log(error);
-                            }.bind(this));
-                        }.bind(this), function(error) {
-                            console.log(error);
-                        }.bind(this));
-                }.bind(this), function(error) {
-                    console.log(error);
-                }.bind(this));
-            }.bind(this), function(error) {
-                console.log(error);
-            });
-        }.bind(this), function(error) {
-            console.log(error);
-        }.bind(this));
-    };
-*/
 
     // Private functions
 
@@ -339,7 +183,7 @@
             request.path = appendTimestamp(options.path);
         }
         if (options.url) {
-            request.url = options.url;
+            request.url = appendTimestamp(options.url);
         }
         if (options.responseType) {
             request.responseType = options.responseType;
@@ -412,103 +256,6 @@
         } else {
             return url + "&" + (new Date()).getTime();
         }
-    };
-
-    var getSha = function(repositoryName, branch, filePath, onSuccess, onError) {
-        sendGetRequest.call(this, {
-            path: "/repos/" + this.username_ + "/" + repositoryName + "/contents" + filePath + "?ref=" + branch,
-            onSuccess: function(item) {
-                console.log(item);
-                onSuccess(item.sha);
-            }.bind(this),
-            onError: function(error) {
-                console.log(error);
-            }.bind(this)
-        });
-    };
-
-    var getLatestCommitSha = function(repositoryName, branch, onSuccess, onError) {
-        sendGetRequest.call(this, {
-            path: "/repos/" + this.username_ + "/" + repositoryName + "/git/refs/heads/" + branch,
-            onSuccess: function(ref) {
-                console.log(ref);
-                onSuccess(ref.object.sha);
-            }.bind(this),
-            onError: function(error) {
-                console.log(error);
-            }.bind(this)
-        });
-    };
-
-    var getTree = function(repositoryName, tree, recursive, onSuccess, onError) {
-        var path = "/repos/" + this.username_ + "/" + repositoryName + "/git/trees/" + tree;
-        if (recursive) {
-            path += "?recursive=1";
-        }
-        sendGetRequest.call(this, {
-            path: path,
-            onSuccess: function(result) {
-                onSuccess(result.tree);
-            }.bind(this),
-            onError: function(error) {
-                console.log(error);
-            }.bind(this)
-        });
-    };
-
-    var postTree = function(repositoryName, tree, onSuccess, onError) {
-        sendPostRequest.call(this, {
-            path: "/repos/" + this.username_ + "/" + repositoryName + "/git/trees",
-            data: {
-                tree: tree
-            },
-            onSuccess: function(result) {
-                console.log(result);
-                onSuccess(result.sha);
-            }.bind(this),
-            onError: function(error) {
-                console.log(error);
-            }.bind(this)
-        });
-    };
-
-    var commit = function(repositoryName, parent, tree, message, onSuccess, onError) {
-        var data = {
-            message: message,
-            author: {
-                name: "Yoichiro Tanaka",
-                email: "yoichiro@eisbahn.jp"
-            },
-            parents: [
-                parent
-            ],
-            tree: tree
-        };
-        sendPostRequest.call(this, {
-            path: "/repos/" + this.username_ + "/" + repositoryName + "/git/commits",
-            data: data,
-            onSuccess: function(result) {
-                onSuccess(result.sha);
-            }.bind(this),
-            onError: function(error) {
-                console.log(error);
-            }.bind(this)
-        });
-    };
-
-    var updateHead = function(repositoryName, head, commit, onSuccess) {
-        sendPatchRequest.call(this, {
-            path: "/repos/" + this.username_ + "/" + repositoryName + "/git/refs/heads/" + head,
-            data: {
-                sha: commit
-            },
-            onSuccess: function(result) {
-                onSuccess();
-            }.bind(this),
-            onError: function(error) {
-                console.log(error);
-            }.bind(this)
-        });
     };
 
     var initializeJQueryAjaxBinaryHandler = function() {
